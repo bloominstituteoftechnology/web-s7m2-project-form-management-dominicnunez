@@ -98,7 +98,11 @@ export default function App() {
     // Don't allow the page to reload! Prevent the default behavior
     // and clean up the form after submitting
     evt.preventDefault();
-    submitNewMember();
+    if (editing) {
+      editExistingMember();
+    } else {
+      submitNewMember();
+    }
   };
   return (
     <div>
