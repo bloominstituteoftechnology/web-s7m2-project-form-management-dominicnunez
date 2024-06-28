@@ -50,11 +50,15 @@ export default function App() {
     // then we need to reset the form back to empty values
     if (editing == null) {
       resetInputValues();
+    } else {
+      //
+      let memberEdit = members.find(({ id }) => id === editing)
+      setInputValue({
+        fname: memberEdit.fname,
+        lname: memberEdit.lname,
+        bio: memberEdit.bio,
+      });
     }
-    // else {
-    //   //
-    //   members.find(({ id }) => id === editing)
-    // }
   }, [editing]);
 
   const onChange = (evt) => {
@@ -68,6 +72,7 @@ export default function App() {
     // ✨ Put this function inside a click handler for the <button>Edit</button>.
     // It should change the value of `editing` state to be the id of the member
     // whose Edit button was clicked
+    setEditing(id);
   };
   const submitNewMember = () => {
     // This takes the values of the form and constructs a new member object,
@@ -109,7 +114,7 @@ export default function App() {
                 </h4>
                 <p>{mem.bio}</p>
               </div>
-              <button>Edit</button>
+              <button onClick={() => edit(mem.id)}>Edit</button>
             </div>
           ))}
         </div>
