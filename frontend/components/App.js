@@ -23,24 +23,17 @@ I enjoy bringing creativity and aesthetics to the digital world.",
   },
 ];
 
+const initialValues = () => ({
+  fname: "",
+  lname: "",
+  bio: "",
+});
+
 export default function App() {
   const [members, setMembers] = useState(teamMembers);
   const [editing, setEditing] = useState(null);
-  const [inputValue, setInputValue] = useState({
-    fname: "",
-    lname: "",
-    bio: "",
-  });
+  const [inputValue, setInputValue] = useState(initialValues());
   // ✨ Create a third state to track the values of the inputs
-  // console.log(members.length)
-
-  const resetInputValues = () => {
-    setInputValue({
-      fname: "",
-      lname: "",
-      bio: "",
-    });
-  }
 
   useEffect(() => {
     // ✨ If the `editing` state changes from null to the number 2 (for example)
@@ -48,16 +41,16 @@ export default function App() {
     // with the data belonging to the member with id 2.
     // On the other hand, if the `editing` state changes back to null
     // then we need to reset the form back to empty values
-    if (editing == null) {
-      resetInputValues();
-    } else {
-      //
-      let memberEdit = members.find(({ id }) => id === editing)
+    if (editing) {
+      const memberEdit = members.find(({ id }) => id === editing)
       setInputValue({
         fname: memberEdit.fname,
         lname: memberEdit.lname,
         bio: memberEdit.bio,
       });
+      // OR
+      // const { fname, lname, bio} = members.find(({ id }) => id === editing)
+      // setInputValue({ fname, lname, bio})
     }
   }, [editing]);
 
@@ -65,8 +58,10 @@ export default function App() {
     // ✨ This is the change handler for your text inputs and your textarea.
     // You can check `evt.target.id` to know which input changed
     // and then you can use `evt.target.value` to update the state of the form
-    const { name, value } = evt.target;
-    setInputValue({ ...inputValue, [name]: value });
+    const { id, value } = evt.target;
+    setInputValue({ ...inputValue, [id]: value });
+    // or even better - avoid race conditions
+    // setInputValue(prevValues => ({...prevValues, [id]: value}))
   };
   const edit = (id) => {
     // ✨ Put this function inside a click handler for the <button>Edit</button>.
@@ -79,17 +74,39 @@ export default function App() {
     // which is then concatenated at the end of the `members` state
     setMembers(
       members.concat({
-        id: members.length + 1,
+        id: getId(),
         fname: inputValue.fname,
         lname: inputValue.lname,
         bio: inputValue.bio,
       })
     );
-    resetInputValues();
+    // OR
+    // const { fname, lname, bio } = inputValue;
+    // newMember = { fname, lname, bio, id: getId() }
+    // setMembers([...members, newMember])
   };
   const editExistingMember = () => {
     // ✨ This takes the values of the form and replaces the data of the
     // member in the `members` state whose id matches the `editing` state
+    let memberIndex = members.findIndex(({ id }) => id === editing)
+    let membersTemp = [...members];
+  
+    membersTemp[memberIndex] = {
+      ...membersTemp[memberIndex],
+      fname: inputValue.fname,
+      lname: inputValue.lname,
+      bio: inputValue.bio,
+    }
+    setMembers(membersTemp);
+    // Or even better - avoid race conditions
+    // setMembers(prevMembers => prevMembers.map(mem => {
+    //   if (mem.id == editing) {
+    //     return {...mem, ...inputValue}
+    //   } else {
+    //     return mem;
+    //   }
+    // }))
+    setEditing(null);
   };
   const onSubmit = (evt) => {
     // ✨ This is the submit handler for your form element.
@@ -103,6 +120,7 @@ export default function App() {
     } else {
       submitNewMember();
     }
+    setInputValue(initialValues());
   };
   return (
     <div>
