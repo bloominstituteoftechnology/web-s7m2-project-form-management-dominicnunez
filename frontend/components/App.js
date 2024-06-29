@@ -80,10 +80,10 @@ export default function App() {
         bio: inputValue.bio,
       })
     );
-    // OR
+    // or - avoid race conditions
     // const { fname, lname, bio } = inputValue;
-    // newMember = { fname, lname, bio, id: getId() }
-    // setMembers([...members, newMember])
+    // const newMember = { fname, lname, bio, id: getId() }
+    // setMembers(prevMembers => ([...prevMembers, newMember]))
   };
   const editExistingMember = () => {
     // ✨ This takes the values of the form and replaces the data of the
